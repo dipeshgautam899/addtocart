@@ -555,15 +555,14 @@ body { font-family: sans-serif; }
       });
     }
 
-    // Function to get a product by its id
-    function getProductById(id) {
-      // This is just a dummy implementation, replace with your own implementation
-      if (id === 1) {
-        return { id: 1, name: 'Product 1', price: 10 };
-      } else if (id === 2) {
-        return { id: 2, name: 'Product 2', price: 20 };
-      }
-    }
+     // Function to get a product by its id
+  function getProductById(id) {
+    // Find the product in the products array
+    var product = products.find(p => p.id === id);
+
+    // Return the product if found, otherwise null
+    return product || null;
+  }
   });
 
 </script>
