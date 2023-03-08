@@ -14,7 +14,7 @@ if (!$conn) {
 }
 
 // Fetch category data
-$sql = "SELECT * FROM categories";
+$sql = "SELECT id, name FROM categories";
 $result = mysqli_query($conn, $sql);
 
  // Close connection
@@ -42,7 +42,7 @@ $result = mysqli_query($conn, $sql);
         <a class="link" href="login.html">Login</a>
       </div>
     </button>
-    <button type="button" class="btn btn-link"> 
+    <button type="button" class="btn btn-link">
       <div class="link">
         <a class="link" href="signup.html">Signup</a>
       </div>
@@ -73,6 +73,7 @@ $result = mysqli_query($conn, $sql);
 
 
 </section>
+
 <nav class="navbar navbar-expand-lg bg-light sticky-sm-top">
   <div class="container">
     <a class="navbar-brand" href="#"><img class="logo" src="./img/SAIT_Logo-removebg-preview.png"></a>
@@ -116,7 +117,7 @@ $result = mysqli_query($conn, $sql);
     </div>
   </div>
 </section>
-<section class="text-center container bg-light">
+<section class="text-center container bg-light data-sticky_parent">
   <div class=" bg-white">
     <div class="nav-about">
       <ul class="nav nav-pills nav-fill">
@@ -151,12 +152,12 @@ $result = mysqli_query($conn, $sql);
                   <?php
                   if (mysqli_num_rows($result) > 0) {
                     while($row = mysqli_fetch_assoc($result)) {
-                        echo '<li><div class="col-12 text-start py-3 "><div class="menuI bg-light">'.$row["name"].'</div></div></li>';
+                        echo '<div class="col-12 text-start py-3 "><a href="#' . $row["name"] . '">' . $row["name"] . '</a></div>';
                     }
                 } else {
                     echo "No categories found.";
                 }
-                  ?>                 
+                  ?>
                 </ul>
               </div>
             </div>
@@ -204,138 +205,165 @@ $result = mysqli_query($conn, $sql);
                   </div>
                 </div> -->
                 <div class="col-12 text-start text-danger">
-    <h2>FOOD MENU</h2>
-</div>
+                  <h2>FOOD MENU</h2>
+                </div>
 
-<?php
-      // Initialize cart array if not already set
-      if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = array();
-      }
-       // Check if product was added to cart
-  if (isset($_POST['add-to-cart'])) {
-    $id = $_POST['id'];
-    $name = $_POST['name'];
-    $price = $_POST['price'];
-    $quantity = $_POST['quantity'];
+                <?php
+                  // Initialize cart array if not already set
+                  if (!isset($_SESSION['cart'])) {
+                    $_SESSION['cart'] = array();
+                  }
+                  // Check if product was added to cart
+                  if (isset($_POST['add-to-cart'])) {
+                    $id = $_POST['id'];
+                    $name = $_POST['name'];
+                    $price = $_POST['price'];
+                    $quantity = $_POST['quantity'];
 
+                    // Check if product already exists in cart
+                    if (isset($_SESSION['cart'][$id])) {
+                      // Update quantity and price of existing item
+                      $_SESSION['cart'][$id]['quantity'] += $quantity;
+                      $_SESSION['cart'][$id]['price'] = $price * $_SESSION['cart'][$id]['quantity'];
+                    } else {
+                      // Add new item to cart
+                      $_SESSION['cart'][$id] = array(
+                        'name' => $name,
+                        'price' => $price * $quantity,
+                        'quantity' => $quantity
+                      );
+                    }        
+                  }
 
-    // Add product to cart
-    $_SESSION['cart'][$id] = array(
-      'name' => $name,
-      'price' => $price,
-      'quantity' => $quantity
-    );
-  }
+                  // Check if product was removed from cart
+                  if (isset($_POST['remove-from-cart'])) {
+                    $id = $_POST['id'];
+                    unset($_SESSION['cart'][$id]);
+                    }
+                  // Check if cart was cleared  
+                  if (isset($_POST['clear-cart'])) {
+                    unset($_SESSION['cart']);   
+                    }
+                    // Fetch product data
+                    $host = "localhost";
+                    $user = "root";
+                    $password = "";
+                    $dbname = "inventory_system";
 
-  if (isset($_POST['remove-from-cart'])) {
-    $id = $_POST['id'];
-    unset($_SESSION['cart'][$id]);
-    }
-    
-  if (isset($_POST['clear-cart'])) {
-    unset($_SESSION['cart']);
-    }
-    // Fetch product data
-    $host = "localhost";
-    $user = "root";
-    $password = "";
-    $dbname = "inventory_system";
+                    $conn = mysqli_connect($host, $user, $password, $dbname);
 
-    $conn = mysqli_connect($host, $user, $password, $dbname);
+                    // Check connection
+                    if (!$conn) {
+                        die("Connection failed: " . mysqli_connect_error());
+                    }
 
-    // Check connection
-    if (!$conn) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
+                $sql = "SELECT id, name, sale_price FROM products";
+                $result = mysqli_query($conn, $sql);
 
-    $sql = "SELECT id, name, sale_price FROM products";
-    $result = mysqli_query($conn, $sql);
+                // Loop through the product data and generate HTML code
+                if (mysqli_num_rows($result) > 0) {
+                    while($row = mysqli_fetch_assoc($result)) {
+                      $id = isset($row['id']) ? $row['id'] : '';
+                    $name = isset($row['name']) ? $row['name'] : '';
+                    $salePrice = isset($row['sale_price']) ? $row['sale_price'] : '';
+                        echo '<div class="col-12 text-start py-2">
+                                  <div class="menuL bg-white">
+                                      <h4><strong>' . $row['name'] . '</strong></h4>
+                                      <strong>Rs.' . $row['sale_price'] . '</strong>
+                                      <div class="d-grid d-md-flex justify-content-center">
+                                          <form action="" method="POST" class="add-to-cart-form">
+                                              <input type="hidden" name="id" value="'.$row["id"].'">
+                                              <input type="hidden" name="name" value="'.$row["name"].'">
+                                              <input type="hidden" name="price" value="'.$row["sale_price"].'">
+                                              <input type="number" name="quantity" value="1" min="1" style="width: 40px;">
+                                              <button type="submit" class="btn btn-outline-primary" class="add-to-cart" name="add-to-cart"><i class="bi bi-cart-plus"></i></button>
+                                          </form>
+                                      </div>
+                                  </div>
+                              </div>';
+                              }
+                          } else {
+                              echo "No products found.";
+                          }
+                          
+                          // Close connection
+                          mysqli_close($conn);
+                      ?>
 
-    // Loop through the product data and generate HTML code
-    if (mysqli_num_rows($result) > 0) {
-        while($row = mysqli_fetch_assoc($result)) {
-          $id = isset($row['id']) ? $row['id'] : '';
-        $name = isset($row['name']) ? $row['name'] : '';
-        $salePrice = isset($row['sale_price']) ? $row['sale_price'] : '';
-            echo '<div class="col-12 text-start py-2">
-                      <div class="menuL bg-white">
-                          <h4><strong>' . $row['name'] . '</strong></h4>
-                          <strong>Rs.' . $row['sale_price'] . '</strong>
-                          <div class="d-grid d-md-flex justify-content-center">
-                              <form action="" method="POST" class="add-to-cart-form">
-                                  <input type="hidden" name="id" value="'.$row["id"].'">
-                                  <input type="hidden" name="name" value="'.$row["name"].'">
-                                  <input type="hidden" name="price" value="'.$row["sale_price"].'">
-                                  <input type="number" name="quantity" value="1" min="1">
-                                  <button type="submit" class="btn btn-primary" name="add-to-cart">Add to Cart</button>
-                              </form>
-                          </div>
-                      </div>
-                  </div>';
-        }
-    } else {
-        echo "No products found.";
-    }
-     
-    // Close connection
-    mysqli_close($conn);
-?>
-
-</div>
-</div>
-</div>
-</div> 
-<div class="cart col-lg-3 sticky-top" id="cart">
-<h3>Shopping Cart</h3>
-<?php if (!empty($_SESSION['cart'])): ?>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-      <?php foreach($_SESSION['cart'] as $id => $product): ?>
-  <tr>
-    <td><?php echo $product['name']; ?></td>
-    <td><?php echo $product['price']; ?></td>
-    <td><?php echo $product['quantity']; ?></td>
-    
-    <td>
-      <form action="" method="POST">
-        <input type="hidden" name="id" value="<?php echo $id; ?>">
-        <button type="submit" class="btn btn-danger" name="remove-from-cart">Remove</button>
-      </form>
-    </td>
-  </tr>
-<?php endforeach; ?>
-
-</tbody>
-    </table>
-    <div class="text-end">
-      <form action="" method="POST">
-        <button type="submit" class="btn btn-danger" name="clear-cart">Clear Cart</button>
-      </form>
-      <form action="checkout.php" method="POST">
-        <button type="submit" class="btn btn-primary" name="checkout">Checkout</button>
-      </form>
-    </div>
-  <?php else: ?>
-    <p>Your cart is empty.</p>
-  <?php endif; ?>
+              </div>
+            </div>
+          </div>
         </div>
+        
+        <div class="cart col-lg-3" id="cart">
+          <h3>Shopping Cart</h3>
+          <?php if (!empty($_SESSION['cart'])): ?>
+          <?php
+          $totalPrice = 0;
+          foreach($_SESSION['cart'] as $id => $product) {
+            $totalPrice += $product['price'] * $product['quantity'];
+          }
+          ?>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach($_SESSION['cart'] as $id => $product): ?>
+              <tr>
+                <td>
+                  <?php echo $product['name']; ?>
+                </td>
+                <td>
+                  <?php echo $product['price']; ?>
+                </td>
+                <td>
+                  <?php echo $product['quantity']; ?>
+                </td>
+
+                <td>
+                  <form action="" method="POST">
+                    <input type="hidden" name="id" value="<?php echo $id; ?>">
+                    <button type="submit" class="btn btn-danger" class="remove-from-cart" name="remove-from-cart"><i
+                        class="bi bi-trash"></i></button>
+                  </form>
+                </td>
+              </tr>
+              <?php endforeach; ?>
+              <tr>
+                <td colspan="3" class="text-end"><strong>Total Price:</strong></td>
+                <td><strong>
+                    <?php echo $totalPrice; ?>
+                  </strong></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="text-end">
+            <form action="" method="POST" class="d-inline-block">
+              <button type="submit" class="btn btn-danger" class="clear-cart" name="clear-cart">Clear Cart</button>
+            </form>
+            <form action="checkout.php" method="POST" class="d-inline-block">
+              <button type="submit" class="btn btn-primary" name="checkout">Checkout</button>
+            </form>
+          </div>
+          <?php else: ?>
+          <p>Your cart is empty.</p>
+          <?php endif; ?>
+        </div>
+      </div>
+
     </div>
-                    
-  </div>
+
 </section>
 
-     
 
-      
+
+
 <!-- Start footer -->
 <footer class="py-5">
   <div class="container">
@@ -396,6 +424,76 @@ $result = mysqli_query($conn, $sql);
       nav: true
     });
   });
+</script>
+<script>
+  $(document).ready(function () {
+    // Define an empty cart array
+    var cart = [];
+
+    // Handle add to cart button click
+    $('.add-to-cart').click(function () {
+      // Get the product id
+      var id = $(this).data('id');
+
+      // Check if the product is already in the cart
+      var cartItem = cart.find(item => item.id === id);
+      if (cartItem) {
+        // If the product is already in the cart, increment its quantity
+        cartItem.quantity++;
+      } else {
+        // If the product is not in the cart, add it
+        cart.push({ id: id, quantity: 1 });
+      }
+
+      // Update the cart UI
+      updateCartUI();
+    });
+
+    // Handle remove from cart button click
+    $('.remove-from-cart').click(function () {
+      // Get the product id
+      var id = $(this).data('id');
+
+      // Find the index of the product in the cart
+      var index = cart.findIndex(item => item.id === id);
+
+      // If the product is in the cart, remove it
+      if (index !== -1) {
+        cart.splice(index, 1);
+      }
+
+      // Update the cart UI
+      updateCartUI();
+    });
+
+    // Function to update the cart UI
+    function updateCartUI() {
+      // Get the cart items element
+      var cartItemsElement = $('#cart-items');
+
+      // Clear the cart items element
+      cartItemsElement.empty();
+
+      // Iterate over the cart items and add them to the cart UI
+      cart.forEach(function (item) {
+        var product = getProductById(item.id);
+        var li = $('<li></li>');
+        li.text(product.name + ' x ' + item.quantity + ' = $' + (product.price * item.quantity));
+        cartItemsElement.append(li);
+      });
+    }
+
+    // Function to get a product by its id
+    function getProductById(id) {
+      // This is just a dummy implementation, replace with your own implementation
+      if (id === 1) {
+        return { id: 1, name: 'Product 1', price: 10 };
+      } else if (id === 2) {
+        return { id: 2, name: 'Product 2', price: 20 };
+      }
+    }
+  });
+
 </script>
 
 
