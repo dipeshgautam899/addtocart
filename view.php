@@ -34,6 +34,8 @@ $result = mysqli_query($conn, $sql);
     integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="./css/style.css.map">
+  <!--Flickity Crousel -->
+  <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
 </head>
 <section class="bg1 text-light ">
   <div class="d-flex flex-row-reverse container ">
@@ -102,7 +104,7 @@ $result = mysqli_query($conn, $sql);
     </div>
   </div>
 </nav>
-<section class="aditi container">
+<!-- <section class="aditi container">
   <div class="container">
     <div class="row py-0">
       <div class="col-lg-4">
@@ -116,10 +118,72 @@ $result = mysqli_query($conn, $sql);
       </div>
     </div>
   </div>
-</section>
+</section> -->
+<style>
+  * { box-sizing: border-box; }
+
+body { font-family: sans-serif; }
+
+.carousel {
+  background: #FAFAFA;
+}
+
+.carousel-cell {
+  width: 25%;
+  height: 300px;
+  margin-right: 10px;
+  background: #333;
+}
+
+.carousel-cell-image {
+  display: block;
+  max-height: 100%;
+  height: 300px;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  opacity: 0;
+  -webkit-transition: opacity 0.4s;
+          transition: opacity 0.4s;
+}
+
+/* fade in lazy loaded image */
+.carousel-cell-image.flickity-lazyloaded,
+.carousel-cell-image.flickity-lazyerror {
+  opacity: 1;
+}
+
+.flickity-page-dots, .flickity-prev-next-button{
+  display: none;
+}
+</style>
+<div class="carousel"
+   data-flickity='{ "lazyLoad": 2, "initialIndex": 2, "autoPlay": true,"wrapAround": true, "autoPlay": 1500 }'>
+  <div class="carousel-cell">
+    <img class="carousel-cell-image"
+      data-flickity-lazyload="img/login.jpg" alt="tulip" />
+  </div>
+  <div class="carousel-cell">
+    <img class="carousel-cell-image"
+      data-flickity-lazyload="img/lunch.jpg" alt="grapes" />
+  </div>
+  <div class="carousel-cell">
+    <img class="carousel-cell-image"
+      data-flickity-lazyload="img/break.jpg" alt="raspberries" />
+  </div>
+  <div class="carousel-cell">
+    <img class="carousel-cell-image"
+      data-flickity-lazyload="img/dinner.jpg" alt="wolf" />
+  </div>
+  <div class="carousel-cell">
+    <img class="carousel-cell-image"
+      data-flickity-lazyload="img/rice.jpg" alt="sea" />
+  </div>
+  
+</div>
 <section class="text-center container bg-light data-sticky_parent">
   <div class=" bg-white">
-    <div class="nav-about">
+    <!-- <div class="nav-about">
       <ul class="nav nav-pills nav-fill">
         <li class="nav-item">
           <a class="nav-link " aria-current="page" href="#">Order Online</a>
@@ -137,7 +201,7 @@ $result = mysqli_query($conn, $sql);
           <a class="nav-link" href="#">Reviews</a>
         </li>
       </ul>
-    </div>
+    </div> -->
     <div class="bg-light">
       <div class="row">
         <div class="col-lg-9">
@@ -149,6 +213,12 @@ $result = mysqli_query($conn, $sql);
               </form>
               <div class="menu-item">
                 <ul>
+                  <style>
+                    ul a{
+                      text-decoration:none;
+                      color:black;
+                    }
+                  </style>
                   <?php
                   if (mysqli_num_rows($result) > 0) {
                     while($row = mysqli_fetch_assoc($result)) {
@@ -163,7 +233,7 @@ $result = mysqli_query($conn, $sql);
             </div>
             <div class="col-lg-8 p-2">
               <div class="row">
-                <!-- <div class="col-lg-6">
+                <div class="col-lg-6">
                 <div class="card text-start" style="width: 15rem;">
                     <img src="./img/food.webp" class="card-img-top" alt="...">
                     <div class="card-body">
@@ -203,7 +273,7 @@ $result = mysqli_query($conn, $sql);
                       <a href="#" class="btn btn-primary">Add To Cart</a>
                     </div>
                   </div>
-                </div> -->
+                </div>
                 <div class="col-12 text-start text-danger">
                   <h2>FOOD MENU</h2>
                 </div>
@@ -417,6 +487,8 @@ $result = mysqli_query($conn, $sql);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
   integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+<!--Flickity Crousel -->
+<script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
 <script>
   $(document).ready(function () {
     $(".owl-carousel").owlCarousel({
